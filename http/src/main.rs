@@ -190,7 +190,7 @@ async fn main() -> std::io::Result<()> {
     eprintln!("failed to close engine: {}", e);
   }
 
-  let _ = shutdown_handle.abort();
+  shutdown_handle.abort();
   println!("engine is closed");
 
   Ok(())

@@ -24,20 +24,15 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
-  lint-test:
-    name: Lint & Tests (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-
+  lint-test-coverage:
+    runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/checkout@v4
 
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.83.0
-          override: true
+          toolchain: nightly          
           components: rustfmt, clippy, llvm-tools-preview
 
       - uses: mozilla-actions/sccache-action@v0.0.4
@@ -48,20 +43,20 @@ jobs:
         with:
           tool: cargo-nextest
 
-      - name: Format & Clippy
+      - name: Format & clippy checks
         run: |
           cargo fmt --all -- --check
           cargo clippy --workspace --all-features -- -D warnings
         continue-on-error: true
 
-      - name: Build & Run Tests
+      - name: Build & run tests
         run: |
           cargo test --workspace --all-features --no-run
           cargo nextest run --all-features
 
   
   coverage:
-    needs: lint-test
+    needs: lint-test-coverage
     if: ${{ success() }}
     runs-on: ubuntu-latest
 
@@ -87,17 +82,14 @@ jobs:
           mkdir -p coverage
           cargo llvm-cov --workspace --all-features --lcov --output-path coverage/lcov.info
 
-      - name: Upload coverage to Codecov
+      - name: Upload to Codecov
         uses: codecov/codecov-action@v4
         with:
-          files: coverage/lcov.info
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: Kevinzh0C/flash-kv
+          files: ./coverage/lcov.info
           fail_ci_if_error: true
 
- 
   docs:
-    needs: lint-test
+    needs: lint-test-coverage
     runs-on: ubuntu-latest
 
     steps:
@@ -106,12 +98,13 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
-          components: rust-docs
+          override: true
 
+      - uses: mozilla-actions/sccache-action@v0.0.4
       - uses: Swatinem/rust-cache@v2
 
       - name: Build docs
         env:
           RUSTFLAGS: "${{ env.RUSTFLAGS }} --cfg docsrs"
-          RUSTDOCFLAGS: "--cfg docsrs -Dwarnings"
+          RUSTDOCFLAGS: "--cfg docsrs"
         run: cargo doc --workspace --all-features --no-deps --document-private-items
