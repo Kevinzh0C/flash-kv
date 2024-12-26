@@ -6,7 +6,7 @@
 
 [<img alt="github" src="https://img.shields.io/badge/github-Kevinzh0C%2Fflash--kv-8da0cb?style=for-the-badge&logo=GitHub&label=github&color=8da0cb" height="22">][Github-url]
 [<img alt="Build" src="https://img.shields.io/github/actions/workflow/status/Kevinzh0C/FlashKV-rs/rust.yml?branch=main&style=for-the-badge&logo=Github-Actions" height="22">][CI-url]
-[<img alt="Codecov" src="https://codecov.io/gh/Kevinzh0C/flash-kv/graph/badge.svg?token=DRSZ6RG2S8" height="22">][codecov-url]
+[<img alt="Codecov" src="https://img.shields.io/codecov/c/gh/Kevinzh0C/FlashKV-rs?style=for-the-badge&logo=codecov" height="22">][codecov-url]
 [<img alt="GitHub License" src="https://img.shields.io/github/license/Kevinzh0C/FlashKV-rs?style=for-the-badge&logo=license&label=license" height="22">][License-url]
 
 An efficient key-value storage engine, designed for fast reading and writing, which is inspired by [Bitcask][bitcask_url].
