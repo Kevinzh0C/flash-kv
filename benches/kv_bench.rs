@@ -82,7 +82,6 @@ fn bench_get_miss(c: &mut Criterion) {
 
 fn bench_delete_hit(c: &mut Criterion) {
   run_bench_with_context(c, "flash-kv-delete-hit-bench", |b, engine| {
-    let mut rnd = rand::rng();
     use std::cell::Cell;
     thread_local!(static DELETE_INDEX: Cell<usize> = Cell::new(0));
 

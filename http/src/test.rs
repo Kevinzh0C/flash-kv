@@ -1,10 +1,12 @@
 use super::*;
 use actix_web::{http::StatusCode, test};
+use tempfile::tempdir;
 
 #[actix_web::test]
 async fn test_put_handler() {
+  let temp_dir = tempdir().expect("Failed to create temp dir for put test");
   let mut opts = Options::default();
-  opts.dir_path = PathBuf::from("/tmp/flash-kv-http");
+  opts.dir_path = temp_dir.path().to_path_buf();
   let engine = Arc::new(Engine::open(opts).unwrap());
 
   let mut app = test::init_service(
@@ -25,9 +27,14 @@ async fn test_put_handler() {
 
 #[actix_web::test]
 async fn test_get_handler() {
+  let temp_dir = tempdir().expect("Failed to create temp dir for get test");
   let mut opts = Options::default();
-  opts.dir_path = PathBuf::from("/tmp/flash-kv-http");
+  opts.dir_path = temp_dir.path().to_path_buf();
   let engine = Arc::new(Engine::open(opts).unwrap());
+
+  engine
+    .put((b"test" as &[u8]).into(), (b"test value" as &[u8]).into())
+    .unwrap();
 
   let mut app = test::init_service(
     App::new()
@@ -36,12 +43,6 @@ async fn test_get_handler() {
   )
   .await;
 
-  // Insert a key-value pair
-  let _ = test::TestRequest::with_uri("/flash-kv/put")
-    .method(actix_web::http::Method::POST)
-    .set_json(&json!({"key": "test", "value": "test value"}))
-    .to_request();
-
   let req = test::TestRequest::with_uri("/flash-kv/get/test").to_request();
   let resp = test::call_service(&mut app, req).await;
   assert_eq!(resp.status(), StatusCode::OK);
@@ -49,9 +50,17 @@ async fn test_get_handler() {
 
 #[actix_web::test]
 async fn test_listkeys_handler() {
+  let temp_dir = tempdir().expect("Failed to create temp dir for listkeys test");
   let mut opts = Options::default();
-  opts.dir_path = PathBuf::from("/tmp/flash-kv-http");
+  opts.dir_path = temp_dir.path().to_path_buf();
   let engine = Arc::new(Engine::open(opts).unwrap());
+
+  engine
+    .put((b"key1" as &[u8]).into(), (b"val1" as &[u8]).into())
+    .unwrap();
+  engine
+    .put((b"key2" as &[u8]).into(), (b"val2" as &[u8]).into())
+    .unwrap();
 
   let mut app = test::init_service(
     App::new()
@@ -67,8 +76,9 @@ async fn test_listkeys_handler() {
 
 #[actix_web::test]
 async fn test_stat_handler() {
+  let temp_dir = tempdir().expect("Failed to create temp dir for stat test");
   let mut opts = Options::default();
-  opts.dir_path = PathBuf::from("/tmp/flash-kv-http");
+  opts.dir_path = temp_dir.path().to_path_buf();
   let engine = Arc::new(Engine::open(opts).unwrap());
 
   let mut app = test::init_service(
