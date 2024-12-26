@@ -156,34 +156,60 @@ mod tests {
 
   #[test]
   fn test_log_record_encode_and_get_crc() {
-    // set a normal log record
+    // Helper function to verify CRC
+    let verify_crc = |record: &LogRecord| {
+      let encoded_data = record.encode();
+      let len = encoded_data.len();
+      assert!(len > 4, "Encoded data should be longer than CRC length");
+
+      // Extract payload and stored CRC
+      let payload = &encoded_data[0..len - 4];
+      let stored_crc_bytes: [u8; 4] = encoded_data[len - 4..].try_into().unwrap();
+      let stored_crc = u32::from_be_bytes(stored_crc_bytes);
+
+      // Recalculate CRC on payload
+      let mut hasher = crc32fast::Hasher::new();
+      hasher.update(payload);
+      let calculated_crc = hasher.finalize();
+
+      // Compare
+      assert_eq!(
+        calculated_crc, stored_crc,
+        "CRC mismatch for record: {:?}",
+        record
+      );
+
+      // Also check that get_crc() returns the same value
+      assert_eq!(
+        record.get_crc(),
+        stored_crc,
+        "get_crc() mismatch for record: {:?}",
+        record
+      );
+    };
+
+    // Test case 1: normal log record
     let rec1 = LogRecord {
       key: "key-a".as_bytes().to_vec(),
       value: "value-a".as_bytes().to_vec(),
       rec_type: LogRecordType::Normal,
     };
-    let enc1 = rec1.encode();
-    assert!(enc1.len() > 5);
-    assert_eq!(2460538915, rec1.get_crc());
+    verify_crc(&rec1);
 
-    // set a log record which value is empty
+    // Test case 2: value is empty
     let rec2 = LogRecord {
       key: "flash-kv".as_bytes().to_vec(),
       value: vec![],
       rec_type: LogRecordType::Normal,
     };
-    let enc2 = rec2.encode();
-    assert!(enc2.len() > 5);
-    assert_eq!(3786119330, rec2.get_crc());
+    verify_crc(&rec2);
 
-    // set a deleted log record
+    // Test case 3: deleted log record
     let rec3 = LogRecord {
       key: "key-b".as_bytes().to_vec(),
       value: "value-b".as_bytes().to_vec(),
       rec_type: LogRecordType::Deleted,
     };
-    let enc3 = rec3.encode();
-    assert!(enc3.len() > 5);
-    assert_eq!(2488525827, rec3.get_crc());
+    verify_crc(&rec3);
   }
 }

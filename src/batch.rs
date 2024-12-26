@@ -173,6 +173,7 @@ pub(crate) fn parse_log_record_key(key: Vec<u8>) -> (Vec<u8>, usize) {
 #[cfg(test)]
 mod tests {
   use std::path::PathBuf;
+  use tempfile::tempdir;
 
   use crate::{
     option::Options,
@@ -183,8 +184,9 @@ mod tests {
 
   #[test]
   fn test_write_batch_1() {
+    let temp_dir = tempdir().expect("failed to create temp dir");
     let mut opt = Options::default();
-    opt.dir_path = PathBuf::from("/tmp/flash-kv-batch-1");
+    opt.dir_path = temp_dir.path().to_path_buf();
     opt.data_file_size = 64 * 1024 * 1024; // 64MB
     let engine = Engine::open(opt.clone()).expect("fail to open engine");
 
@@ -210,15 +212,13 @@ mod tests {
     // verify sequence number
     let seq_no = wb.engine.seq_no.load(Ordering::SeqCst);
     assert_eq!(2, seq_no);
-
-    // delete tested files
-    std::fs::remove_dir_all(opt.clone().dir_path).expect("failed to remove dir");
   }
 
   #[test]
   fn test_write_batch_2() {
+    let temp_dir = tempdir().expect("failed to create temp dir");
     let mut opt = Options::default();
-    opt.dir_path = PathBuf::from("/tmp/flash-kv-batch-2");
+    opt.dir_path = temp_dir.path().to_path_buf();
     opt.data_file_size = 64 * 1024 * 1024; // 64MB
     let engine = Engine::open(opt.clone()).expect("fail to open engine");
 
@@ -240,22 +240,18 @@ mod tests {
 
     // verify sequence number after restart
     engine.close().expect("fail to close");
-    std::mem::drop(engine);
-
     let engine2 = Engine::open(opt.clone()).expect("fail to open engine");
     let keys = engine2.list_keys();
     assert_eq!(3, keys.unwrap().len());
     let seq_no = engine2.seq_no.load(Ordering::SeqCst);
     assert_eq!(3, seq_no);
-
-    // delete tested files
-    std::fs::remove_dir_all(opt.clone().dir_path).expect("failed to remove dir");
   }
 
   #[test]
   fn test_write_batch_3() {
+    let temp_dir = tempdir().expect("failed to create temp dir");
     let mut opt = Options::default();
-    opt.dir_path = PathBuf::from("/tmp/flash-kv-batch-2");
+    opt.dir_path = temp_dir.path().to_path_buf();
     opt.data_file_size = 64 * 1024 * 1024; // 64MB
     let engine = Engine::open(opt.clone()).expect("fail to open engine");
 
@@ -272,8 +268,5 @@ mod tests {
 
     let commit_res1 = wb.commit();
     assert!(commit_res1.is_ok());
-
-    // delete tested files
-    std::fs::remove_dir_all(opt.clone().dir_path).expect("failed to remove dir");
   }
 }

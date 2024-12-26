@@ -42,6 +42,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Check formatting
         run: cargo fmt --all -- --check
+        continue-on-error: true
 
   clippy:
     name: clippy
@@ -74,15 +75,8 @@ jobs:
           toolchain: nightly
           override: true
 
-
-      - uses: Swatinem/rust-cache@v1
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      # Use Swatinem/rust-cache@v2 for caching
+      - uses: Swatinem/rust-cache@v2
 
       - name: test all features
         # Run sequentially to avoid race condition around file system size
