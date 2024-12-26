@@ -48,6 +48,7 @@ impl IOManager for MMapIO {
 
     let val = &map_arr[offset as usize..end as usize];
     buf.copy_from_slice(val);
+
     Ok(val.len())
   }
 
@@ -68,6 +69,7 @@ impl IOManager for MMapIO {
 #[cfg(test)]
 mod tests {
   use std::{fs, path::PathBuf};
+  use tempfile::tempdir;
 
   use crate::fio::file_io::FileIO;
 
@@ -75,12 +77,11 @@ mod tests {
 
   #[test]
   fn test_mmap_read() {
-    let path = PathBuf::from("/tmp/mmap-test.data");
+    let temp_dir = tempdir().expect("failed to create temp dir for mmap_read test");
+    let path = temp_dir.path().join("mmap-test.data");
 
-    // Remove the file if it exists to start fresh
     let _ = fs::remove_file(&path);
 
-    // Make sure the file exists but is empty
     let file = OpenOptions::new()
       .create(true)
       .write(true)
@@ -89,23 +90,17 @@ mod tests {
       .unwrap();
     file.sync_all().unwrap();
 
-    // Check file size
     let metadata = fs::metadata(&path).unwrap();
-    println!("Empty file size: {}", metadata.len());
 
-    // file is empty
     let mmap_res1 = MMapIO::new(&path);
     assert!(mmap_res1.is_ok());
     let mmap_io1 = mmap_res1.ok().unwrap();
-    println!("Mmap size for empty file: {}", mmap_io1.size());
 
     let mut buf1 = [0u8; 10];
     let read_res1 = mmap_io1.read(&mut buf1, 0);
 
-    // We expect this to fail with EOF error since we're trying to read past the end of an empty file
     assert!(read_res1.is_err());
 
-    // Now create a non-empty file for the second part of the test
     let fio_res = FileIO::new(&path);
     assert!(fio_res.is_ok());
     let fio = fio_res.ok().unwrap();
@@ -114,29 +109,22 @@ mod tests {
     fio.write(b"seeyou again").unwrap();
     fio.sync().unwrap();
 
-    // Check file size again
     let metadata = fs::metadata(&path).unwrap();
-    println!("Non-empty file size: {}", metadata.len());
 
-    // file is not empty
     let mmap_res2 = MMapIO::new(&path);
     assert!(mmap_res2.is_ok());
     let mmap_io2 = mmap_res2.ok().unwrap();
-    println!("Mmap size for non-empty file: {}", mmap_io2.size());
 
     let mut buf2 = [0u8; 35];
     let read_res2 = mmap_io2.read(&mut buf2, 0);
     assert!(read_res2.is_ok());
-
-    let remove_res = fs::remove_file(&path);
-    assert!(remove_res.is_ok());
   }
 
   #[test]
   fn test_mmap_size() {
-    let path = PathBuf::from("/tmp/mmap-test.data");
+    let temp_dir = tempdir().expect("failed to create temp dir for mmap_size test");
+    let path = temp_dir.path().join("mmap-test.data");
 
-    // file is empty
     let mmap_res1 = MMapIO::new(&path);
     assert!(mmap_res1.is_ok());
     let mmap_io1 = mmap_res1.ok().unwrap();
@@ -149,15 +137,13 @@ mod tests {
     fio.write(b"hello world").unwrap();
     fio.write(b"good morning").unwrap();
     fio.write(b"seeyou again").unwrap();
+    fio.sync().unwrap();
 
-    // file is not empty
     let mmap_res2 = MMapIO::new(&path);
     assert!(mmap_res2.is_ok());
     let mmap_io2 = mmap_res2.ok().unwrap();
     let size2 = mmap_io2.size();
     assert!(size2 > 0);
-
-    let remove_res = fs::remove_file(&path);
-    assert!(remove_res.is_ok());
+    assert_eq!(size2, 35);
   }
 }

@@ -172,7 +172,6 @@ pub(crate) fn parse_log_record_key(key: Vec<u8>) -> (Vec<u8>, usize) {
 
 #[cfg(test)]
 mod tests {
-  use std::path::PathBuf;
   use tempfile::tempdir;
 
   use crate::{

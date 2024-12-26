@@ -84,7 +84,7 @@ jobs:
         with:
           tool: cargo-nextest
 
-      - name: test all features
+      - name: Test all features
         # Run sequentially to avoid race condition around file system size
         # Add timeout via GitHub Actions step property
         timeout-minutes: 5 # 300 seconds
