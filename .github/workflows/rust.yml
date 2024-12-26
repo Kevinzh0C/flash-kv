@@ -26,16 +26,20 @@ env:
   CARGO_TERM_COLOR: always
   RUSTFLAGS: -Dwarnings
   RUST_BACKTRACE: 1
-  nightly: nightly
 
 jobs:
   rustfmt:
     name: rustfmt
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Install Rust
-        run: rustup update stable && rustup default stable
+      - uses: actions/checkout@v4
+      - name: Install Rust stable
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          components: rustfmt
+      - uses: Swatinem/rust-cache@v2
       - name: Check formatting
         run: cargo fmt --all -- --check
 
@@ -43,9 +47,14 @@ jobs:
     name: clippy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Rust stable
-        run: rustup update stable && rustup default stable
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
       - name: Apply clippy lints
         run: cargo clippy --all-features -- -D warnings
 
@@ -54,18 +63,17 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        rust: [nightly]
-        os: 
+        os:
           - ubuntu-latest
           - macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install latest nightly
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: ${{ matrix.rust }}
+          toolchain: nightly
           override: true
-          components: rustfmt, clippy
+
 
       - uses: Swatinem/rust-cache@v1
       - uses: actions/cache@v3
@@ -89,33 +97,19 @@ jobs:
       - clippy
       - rustfmt
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install latest nightly
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
           override: true
-      - uses: actions-rs/install@v0.1
-        with:
-          crate: cargo-tarpaulin
-          version: latest
-      - name: Cache ~/.cargo
-        uses: actions/cache@v3
-        with:
-          path: ~/.cargo
-          key: ${{ runner.os }}-coverage-dotcargo
-      - name: Cache cargo build
-        uses: actions/cache@v3
-        with:
-          path: target
-          key: ${{ runner.os }}-coverage-cargo-build-target
+      - name: Install cargo-tarpaulin
+        run: cargo install cargo-tarpaulin --version 0.27.3
+      - uses: Swatinem/rust-cache@v2
       - name: Run tarpaulin
-        uses: actions-rs/cargo@v1
-        with:
-          command: tarpaulin
-          args: --all-features --run-types tests --run-types doctests --workspace --out xml -- --test-threads 1
+        run: cargo tarpaulin --all-features --run-types tests --run-types doctests --workspace --out xml -- --test-threads 1
       - name: Upload to codecov.io
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
@@ -124,14 +118,14 @@ jobs:
     name: Generate Documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: ${{ env.nightly }}
+          toolchain: nightly
           override: true
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
       - name: Generate documentation
         run: cargo doc --lib --no-deps --all-features --document-private-items
         env:
-          RUSTFLAGS: --cfg docsrs
+          RUSTFLAGS: ${{ env.RUSTFLAGS }} --cfg docsrs
           RUSTDOCFLAGS: --cfg docsrs -Dwarnings
