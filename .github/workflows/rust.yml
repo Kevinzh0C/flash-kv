@@ -78,10 +78,18 @@ jobs:
       # Use Swatinem/rust-cache@v2 for caching
       - uses: Swatinem/rust-cache@v2
 
+      # Install cargo-nextest
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest
+
       - name: test all features
         # Run sequentially to avoid race condition around file system size
-        # Add timeout to prevent test hanging
-        run: timeout 300 cargo test --all-features -- --test-threads 1
+        # Add timeout via GitHub Actions step property
+        timeout-minutes: 5 # 300 seconds
+        # Use cargo nextest run instead of cargo test
+        run: cargo nextest run --all-features 
 
   coverage:
     name: cargo tarpaulin
