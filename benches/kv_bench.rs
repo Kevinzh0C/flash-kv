@@ -47,12 +47,12 @@ fn bench_put(c: &mut Criterion) {
   option.dir_path = temp_dir.path().to_path_buf();
   let engine = Arc::new(Engine::open(option).expect("Failed to open engine"));
 
-  let mut rnd = rand::thread_rng();
+  let mut rnd = rand::rng();
 
   c.bench_function("flash-kv-put-bench", move |b| {
     let engine = engine.clone();
     b.iter(|| {
-      let i = rnd.gen_range(0..u32::MAX) as usize;
+      let i = rnd.random_range(0..u32::MAX) as usize;
       let _ = engine.put(get_test_key(i), get_test_value(i));
     })
   });
@@ -60,9 +60,9 @@ fn bench_put(c: &mut Criterion) {
 
 fn bench_get_hit(c: &mut Criterion) {
   run_bench_with_context(c, "flash-kv-get-hit-bench", |b, engine| {
-    let mut rnd = rand::thread_rng();
+    let mut rnd = rand::rng();
     b.iter(|| {
-      let i = rnd.gen_range(0..NUM_PREPOPULATE_ITEMS);
+      let i = rnd.random_range(0..NUM_PREPOPULATE_ITEMS);
       let res = engine.get(get_test_key(i));
       assert!(res.is_ok());
     })
@@ -71,9 +71,9 @@ fn bench_get_hit(c: &mut Criterion) {
 
 fn bench_get_miss(c: &mut Criterion) {
   run_bench_with_context(c, "flash-kv-get-miss-bench", |b, engine| {
-    let mut rnd = rand::thread_rng();
+    let mut rnd = rand::rng();
     b.iter(|| {
-      let i = rnd.gen_range(NUM_PREPOPULATE_ITEMS..(NUM_PREPOPULATE_ITEMS + 100000));
+      let i = rnd.random_range(NUM_PREPOPULATE_ITEMS..(NUM_PREPOPULATE_ITEMS + 100000));
       let res = engine.get(get_test_key(i));
       assert!(res.is_err());
     })
@@ -82,7 +82,7 @@ fn bench_get_miss(c: &mut Criterion) {
 
 fn bench_delete_hit(c: &mut Criterion) {
   run_bench_with_context(c, "flash-kv-delete-hit-bench", |b, engine| {
-    let mut rnd = rand::thread_rng();
+    let mut rnd = rand::rng();
     use std::cell::Cell;
     thread_local!(static DELETE_INDEX: Cell<usize> = Cell::new(0));
 
