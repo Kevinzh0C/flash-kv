@@ -180,7 +180,7 @@ pub fn get_data_file_name<P>(dir_path: P, file_id: u32) -> PathBuf
 where
   P: AsRef<Path>,
 {
-  let name = format!("{:09}", file_id) + DATA_FILE_NAME_SUFFIX;
+  let name = format!("{file_id:09}") + DATA_FILE_NAME_SUFFIX;
   dir_path.as_ref().join(name)
 }
 
