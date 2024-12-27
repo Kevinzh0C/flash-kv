@@ -81,7 +81,7 @@ impl Engine {
     if !dir_path.is_dir() {
       is_initial = true;
       if let Err(e) = fs::create_dir(dir_path.as_path()) {
-        warn!("failed to create database directory error: {}", e);
+        warn!("failed to create database directory error: {e}");
         return Err(Errors::FailedToCreateDatabaseDir);
       };
     }
@@ -240,7 +240,7 @@ impl Engine {
       &dir_path.as_ref().to_path_buf(),
       exclude,
     ) {
-      log::error!("failed to copy data directory error: {}", e);
+      log::error!("failed to copy data directory error: {e}");
       return Err(Errors::FailedToCopyDirectory);
     }
     Ok(())
@@ -531,7 +531,7 @@ impl Engine {
     let seq_no_file = DataFile::new_seq_no_file(&self.options.dir_path).unwrap();
     let record = match seq_no_file.read_log_record(0) {
       Ok(res) => res.record,
-      Err(e) => panic!("failed to read seq_no: {}", e),
+      Err(e) => panic!("failed to read seq_no: {e}"),
     };
     let v = String::from_utf8(record.value).unwrap();
     let seq_no = v.parse::<usize>().unwrap();
@@ -587,7 +587,7 @@ impl Engine {
 impl Drop for Engine {
   fn drop(&mut self) {
     if let Err(e) = self.close() {
-      error!("error while closing engine {}", e);
+      error!("error while closing engine {e}");
     }
   }
 }

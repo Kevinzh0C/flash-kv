@@ -133,15 +133,15 @@ pub fn decode_log_record_pos(pos: Vec<u8>) -> LogRecordPos {
 
   let fid = match decode_varint(&mut buf) {
     Ok(fid) => fid,
-    Err(e) => panic!("decode log record pos error: {}", e),
+    Err(e) => panic!("decode log record pos error: {e}"),
   };
   let offset = match decode_varint(&mut buf) {
     Ok(offset) => offset,
-    Err(e) => panic!("decode log record pos error: {}", e),
+    Err(e) => panic!("decode log record pos error: {e}"),
   };
   let size = match decode_varint(&mut buf) {
     Ok(size) => size,
-    Err(e) => panic!("decode log record pos error: {}", e),
+    Err(e) => panic!("decode log record pos error: {e}"),
   };
   LogRecordPos {
     file_id: fid as u32,

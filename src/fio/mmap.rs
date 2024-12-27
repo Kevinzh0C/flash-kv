@@ -31,7 +31,7 @@ impl MMapIO {
         })
       }
       Err(e) => {
-        error!("failed to open data file error: {}", e);
+        error!("failed to open data file error: {e}");
         Err(Errors::FailedToOpenDataFile)
       }
     }

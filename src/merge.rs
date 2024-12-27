@@ -61,7 +61,7 @@ impl Engine {
 
     // create merge dir
     if let Err(e) = fs::create_dir(merge_path.clone()) {
-      error!("fail to create merge path {}", e);
+      error!("fail to create merge path {e}");
       return Err(Errors::FailedToCreateDatabaseDir);
     }
 
@@ -238,7 +238,7 @@ where
   let dir = match fs::read_dir(&merge_path) {
     Ok(dir) => dir,
     Err(e) => {
-      error!("fail to read merge dir: {}", e);
+      error!("fail to read merge dir: {e}");
       return Err(Errors::FailedToReadDatabaseDir);
     }
   };

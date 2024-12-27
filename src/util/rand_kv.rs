@@ -2,11 +2,11 @@ use bytes::Bytes;
 
 #[allow(dead_code)]
 pub fn get_test_key(i: usize) -> Bytes {
-  Bytes::from(format!("key-{:09}", i))
+  Bytes::from(format!("key-{i:09}"))
 }
 #[allow(dead_code)]
 pub fn get_test_value(i: usize) -> Bytes {
-  Bytes::from(format!("value-{:09}", i))
+  Bytes::from(format!("value-{i:09}"))
 }
 
 #[test]

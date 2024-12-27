@@ -31,7 +31,7 @@ impl FileIO {
         fd: Arc::new(RwLock::new(file)),
       }),
       Err(e) => {
-        error!("failed to open data file error: {}", e);
+        error!("failed to open data file error: {e}");
         Err(Errors::FailedToOpenDataFile)
       }
     }
@@ -44,7 +44,7 @@ impl IOManager for FileIO {
     match read_guard.read_at(buf, offset) {
       Ok(n) => Ok(n),
       Err(e) => {
-        error!("read from date file error: {}", e);
+        error!("read from date file error: {e}");
         Err(Errors::FailedToReadFromDataFile)
       }
     }
@@ -55,7 +55,7 @@ impl IOManager for FileIO {
     match write_guard.write(buf) {
       Ok(n) => Ok(n),
       Err(e) => {
-        error!("write to data file error: {}", e);
+        error!("write to data file error: {e}");
         Err(Errors::FailedToWriteToDataFile)
       }
     }
@@ -64,7 +64,7 @@ impl IOManager for FileIO {
   fn sync(&self) -> Result<()> {
     let read_guard = self.fd.read();
     if let Err(e) = read_guard.sync_all() {
-      error!("failed to sync data file err: {}", e);
+      error!("failed to sync data file err: {e}");
       return Err(Errors::FailedToSyncToDataFile);
     }
     Ok(())
