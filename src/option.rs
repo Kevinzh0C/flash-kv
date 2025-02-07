@@ -1,4 +1,9 @@
+use lazy_static::lazy_static;
 use std::path::PathBuf;
+
+lazy_static! {
+  pub static ref DEFAULT_DIR_PATH: PathBuf = std::env::temp_dir().join("bitkv-rs");
+}
 
 #[derive(Debug, Clone)]
 pub struct Options {
@@ -39,7 +44,7 @@ pub enum IndexType {
 impl Default for Options {
   fn default() -> Self {
     Self {
-      dir_path: std::env::temp_dir().join("bitkv-rs"),
+      dir_path: DEFAULT_DIR_PATH.clone(),
       data_file_size: 256 * 1024 * 1024, // 256MB
       sync_writes: false,
       bytes_per_sync: 0,

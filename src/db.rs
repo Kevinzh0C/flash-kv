@@ -28,7 +28,6 @@ use std::{
 const INITIAL_FILE_ID: u32 = 0;
 const SEQ_NO_KEY: &str = "seq.no";
 pub(crate) const FILE_LOCK_NAME: &str = "flock";
-
 pub enum SeqNoExist {
   Yes(usize),
   None,
@@ -207,7 +206,7 @@ impl Engine {
     read_guard.sync()?;
 
     // release file lock
-    self.lock_file.unlock().unwrap();
+    fs2::FileExt::unlock(&self.lock_file).unwrap();
 
     Ok(())
   }
