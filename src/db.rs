@@ -67,7 +67,7 @@ pub struct Stat {
 }
 
 impl Engine {
-  /// open bitkv storage engine instance
+  /// open flash-kv storage engine instance
   pub fn open(opts: Options) -> Result<Self> {
     // check user options
     if let Some(e) = check_options(&opts) {

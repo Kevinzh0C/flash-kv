@@ -2,7 +2,7 @@ use lazy_static::lazy_static;
 use std::path::PathBuf;
 
 lazy_static! {
-  pub static ref DEFAULT_DIR_PATH: PathBuf = std::env::temp_dir().join("bitkv-rs");
+  pub static ref DEFAULT_DIR_PATH: PathBuf = std::env::temp_dir().join("flash-kv");
 }
 
 #[derive(Debug, Clone)]

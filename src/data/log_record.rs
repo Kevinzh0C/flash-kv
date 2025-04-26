@@ -168,7 +168,7 @@ mod tests {
 
     // set a log record which value is empty
     let rec2 = LogRecord {
-      key: "bitkv-rs".as_bytes().to_vec(),
+      key: "flash-kv".as_bytes().to_vec(),
       value: vec![],
       rec_type: LogRecordType::Normal,
     };
