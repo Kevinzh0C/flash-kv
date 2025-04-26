@@ -78,7 +78,8 @@ jobs:
 
       - name: test all features
         # Run sequentially to avoid race condition around file system size
-        run: cargo test --all-features -- --test-threads 1
+        # Add timeout to prevent test hanging
+        run: timeout 300 cargo test --all-features -- --test-threads 1
 
   coverage:
     name: cargo tarpaulin
