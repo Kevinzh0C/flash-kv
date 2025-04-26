@@ -1,5 +1,5 @@
-use flash_kv::{db, option::Options};
 use bytes::Bytes;
+use flash_kv::{db, option::Options};
 
 fn main() {
   let opts = Options::default();

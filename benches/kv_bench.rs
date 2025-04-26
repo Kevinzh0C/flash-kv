@@ -1,9 +1,9 @@
+use criterion::{criterion_group, criterion_main, Criterion};
 use flash_kv::{
   db::Engine,
   option::Options,
   util::rand_kv::{get_test_key, get_test_value},
 };
-use criterion::{criterion_group, criterion_main, Criterion};
 use rand::Rng;
 use std::path::PathBuf;
 
