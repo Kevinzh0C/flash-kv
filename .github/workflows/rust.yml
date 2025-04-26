@@ -84,7 +84,6 @@ jobs:
     name: cargo tarpaulin
     runs-on: ubuntu-latest
     needs:
-      - docs
       - unit-tests
       - clippy
       - rustfmt
