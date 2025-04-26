@@ -87,7 +87,7 @@ impl WriteBatch<'_> {
   /// commit the batch write to data file, and update index
   pub fn commit(&self) -> Result<()> {
     let mut pending_writes = self.pending_writes.lock();
-    if pending_writes.len() == 0 {
+    if pending_writes.is_empty() {
       return Ok(());
     }
     if pending_writes.len() > self.options.max_batch_num {

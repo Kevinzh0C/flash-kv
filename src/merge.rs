@@ -129,7 +129,7 @@ impl Engine {
   fn is_engine_empty(&self) -> bool {
     let active_file = self.active_data_file.read();
     let old_files = self.old_data_files.read();
-    active_file.get_write_off() == 0 && old_files.len() == 0
+    active_file.get_write_off() == 0 && old_files.is_empty()
   }
 
   fn rotate_merge_files(&self) -> Result<Vec<DataFile>> {

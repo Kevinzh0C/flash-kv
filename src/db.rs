@@ -415,7 +415,6 @@ impl Engine {
 
   /// load memory index from data files
   /// traverse all data files, and process each log record
-
   fn load_index_from_data_files(&self) -> Result<usize> {
     let mut current_seq_no = NON_TXN_SEQ_NO;
     // if data_files is empty then return
