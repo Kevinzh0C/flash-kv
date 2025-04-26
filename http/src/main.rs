@@ -4,7 +4,7 @@ mod test;
 use actix_web::{
   delete, get, post, rt::signal, web, App, HttpResponse, HttpServer, Responder, Scope,
 };
-use bitkv_rs::{db::Engine, errors::Errors, option::Options};
+use flash_kv::{db::Engine, errors::Errors, option::Options};
 use serde_json::json;
 use std::{
   collections::HashMap,
@@ -94,7 +94,7 @@ pub async fn stat_handler(eng: web::Data<Arc<Engine>>) -> impl Responder {
 }
 
 async fn send_request() -> surf::Result<()> {
-  let uri = "http://127.0.0.1:8080/bitkv/put";
+  let uri = "http://127.0.0.1:8080/flash-kv/put";
   let data = json!({ "key1": "value1", "key2": "value2" });
   let mut res = surf_post(uri).body_json(&data)?.await?;
 
@@ -102,7 +102,7 @@ async fn send_request() -> surf::Result<()> {
   let body = res.body_string().await?;
   println!("Response: {}", body);
 
-  let uri = "http://127.0.0.1:8080/bitkv/listkeys";
+  let uri = "http://127.0.0.1:8080/flash-kv/listkeys";
   let mut res = surf::get(uri).await?;
 
   println!("Status: {}", res.status());
@@ -111,7 +111,7 @@ async fn send_request() -> surf::Result<()> {
   let keys: Vec<String> = serde_json::from_str(&body)?;
 
   for key in keys {
-    let url = format!("http://127.0.0.1:8080/bitkv/get/{}", key);
+    let url = format!("http://127.0.0.1:8080/flash-kv/get/{}", key);
     let mut res = surf::get(url).await?;
     println!("Status: {}", res.status());
     let body = res.body_string().await?;
@@ -124,7 +124,7 @@ async fn send_request() -> surf::Result<()> {
 async fn run_server(engine: Arc<Engine>) -> std::io::Result<()> {
   let server = HttpServer::new(move || {
     App::new().app_data(web::Data::new(engine.clone())).service(
-      Scope::new("/bitkv")
+      Scope::new("/flash-kv")
         .service(put_handler)
         .service(get_handler)
         .service(delete_handler)
@@ -151,7 +151,7 @@ async fn listen_for_enter_key() {
 async fn main() -> std::io::Result<()> {
   let engine = Arc::new(
     Engine::open(Options {
-      dir_path: PathBuf::from("/tmp/bitkv-rs-http"),
+      dir_path: PathBuf::from("/tmp/flash-kv-http"),
       ..Default::default()
     })
     .unwrap(),

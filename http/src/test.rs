@@ -4,17 +4,17 @@ use actix_web::{http::StatusCode, test};
 #[actix_web::test]
 async fn test_put_handler() {
   let mut opts = Options::default();
-  opts.dir_path = PathBuf::from("/tmp/bitkv-rs-http");
+  opts.dir_path = PathBuf::from("/tmp/flash-kv-http");
   let engine = Arc::new(Engine::open(opts).unwrap());
 
   let mut app = test::init_service(
     App::new()
       .app_data(web::Data::new(engine.clone()))
-      .service(Scope::new("/bitkv").service(put_handler)),
+      .service(Scope::new("/flash-kv").service(put_handler)),
   )
   .await;
 
-  let req = test::TestRequest::with_uri("/bitkv/put")
+  let req = test::TestRequest::with_uri("/flash-kv/put")
     .method(actix_web::http::Method::POST)
     .set_json(&json!({"key": "test", "value": "test value"}))
     .to_request();
@@ -26,23 +26,23 @@ async fn test_put_handler() {
 #[actix_web::test]
 async fn test_get_handler() {
   let mut opts = Options::default();
-  opts.dir_path = PathBuf::from("/tmp/bitkv-rs-http");
+  opts.dir_path = PathBuf::from("/tmp/flash-kv-http");
   let engine = Arc::new(Engine::open(opts).unwrap());
 
   let mut app = test::init_service(
     App::new()
       .app_data(web::Data::new(engine.clone()))
-      .service(Scope::new("/bitkv").service(get_handler)),
+      .service(Scope::new("/flash-kv").service(get_handler)),
   )
   .await;
 
   // Insert a key-value pair
-  let _ = test::TestRequest::with_uri("/bitkv/put")
+  let _ = test::TestRequest::with_uri("/flash-kv/put")
     .method(actix_web::http::Method::POST)
     .set_json(&json!({"key": "test", "value": "test value"}))
     .to_request();
 
-  let req = test::TestRequest::with_uri("/bitkv/get/test").to_request();
+  let req = test::TestRequest::with_uri("/flash-kv/get/test").to_request();
   let resp = test::call_service(&mut app, req).await;
   assert_eq!(resp.status(), StatusCode::OK);
 }
@@ -50,17 +50,17 @@ async fn test_get_handler() {
 #[actix_web::test]
 async fn test_listkeys_handler() {
   let mut opts = Options::default();
-  opts.dir_path = PathBuf::from("/tmp/bitkv-rs-http");
+  opts.dir_path = PathBuf::from("/tmp/flash-kv-http");
   let engine = Arc::new(Engine::open(opts).unwrap());
 
   let mut app = test::init_service(
     App::new()
       .app_data(web::Data::new(engine.clone()))
-      .service(Scope::new("/bitkv").service(listkeys_handler)),
+      .service(Scope::new("/flash-kv").service(listkeys_handler)),
   )
   .await;
 
-  let req = test::TestRequest::with_uri("/bitkv/listkeys").to_request();
+  let req = test::TestRequest::with_uri("/flash-kv/listkeys").to_request();
   let resp = test::call_service(&mut app, req).await;
   assert_eq!(resp.status(), StatusCode::OK);
 }
@@ -68,17 +68,17 @@ async fn test_listkeys_handler() {
 #[actix_web::test]
 async fn test_stat_handler() {
   let mut opts = Options::default();
-  opts.dir_path = PathBuf::from("/tmp/bitkv-rs-http");
+  opts.dir_path = PathBuf::from("/tmp/flash-kv-http");
   let engine = Arc::new(Engine::open(opts).unwrap());
 
   let mut app = test::init_service(
     App::new()
       .app_data(web::Data::new(engine.clone()))
-      .service(Scope::new("/bitkv").service(stat_handler)),
+      .service(Scope::new("/flash-kv").service(stat_handler)),
   )
   .await;
 
-  let req = test::TestRequest::with_uri("/bitkv/stat").to_request();
+  let req = test::TestRequest::with_uri("/flash-kv/stat").to_request();
   let resp = test::call_service(&mut app, req).await;
   assert_eq!(resp.status(), StatusCode::OK);
 }

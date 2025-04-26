@@ -316,7 +316,7 @@ mod tests {
   fn test_merge_1() {
     // case for no data files
     let mut opts = Options::default();
-    opts.dir_path = PathBuf::from("/tmp/bitkv-rs-merge-1");
+    opts.dir_path = PathBuf::from("/tmp/flash-kv-merge-1");
     opts.data_file_size = 32 * 1024 * 1024;
 
     let engine = Engine::open(opts.clone()).expect("failed to open engine");
@@ -332,7 +332,7 @@ mod tests {
   fn test_merge_2() {
     // case for all valid data files
     let mut opts = Options::default();
-    opts.dir_path = PathBuf::from("/tmp/bitkv-rs-merge-2");
+    opts.dir_path = PathBuf::from("/tmp/flash-kv-merge-2");
     opts.data_file_size = 32 * 1024 * 1024;
     opts.file_merge_threshold = 0 as f32;
     let engine = Engine::open(opts.clone()).expect("failed to open engine");
@@ -363,7 +363,7 @@ mod tests {
   fn test_merge_3() {
     // partial valid data files, and delete some data cases
     let mut opts = Options::default();
-    opts.dir_path = PathBuf::from("/tmp/bitkv-rs-merge-3");
+    opts.dir_path = PathBuf::from("/tmp/flash-kv-merge-3");
     opts.data_file_size = 32 * 1024 * 1024;
     opts.file_merge_threshold = 0 as f32;
     let engine = Engine::open(opts.clone()).expect("failed to open engine");
@@ -405,7 +405,7 @@ mod tests {
   #[test]
   fn test_merge_4() {
     let mut opts = Options::default();
-    opts.dir_path = PathBuf::from("/tmp/bitkv-rs-merge-4");
+    opts.dir_path = PathBuf::from("/tmp/flash-kv-merge-4");
     opts.data_file_size = 32 * 1024 * 1024;
     opts.file_merge_threshold = 0 as f32;
     let engine = Engine::open(opts.clone()).expect("failed to open engine");
@@ -440,7 +440,7 @@ mod tests {
   fn test_merge_5() {
     // write and delete process occurs when merging
     let mut opts = Options::default();
-    opts.dir_path = PathBuf::from("/tmp/bitkv-rs-merge-5");
+    opts.dir_path = PathBuf::from("/tmp/flash-kv-merge-5");
     opts.data_file_size = 32 * 1024 * 1024;
     opts.file_merge_threshold = 0 as f32;
     let engine = Engine::open(opts.clone()).expect("failed to open engine");

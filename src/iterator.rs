@@ -78,7 +78,7 @@ mod tests {
   #[test]
   fn test_iterator_fold() {
     let mut opt = Options::default();
-    opt.dir_path = PathBuf::from("/tmp/bitkv-rs-iter-fold");
+    opt.dir_path = PathBuf::from("/tmp/flash-kv-iter-fold");
     opt.data_file_size = 64 * 1024 * 1024; // 64MB
     let engine = Engine::open(opt.clone()).expect("fail to open engine");
 
@@ -118,7 +118,7 @@ mod tests {
   #[test]
   fn test_iterator_list_keys() {
     let mut opt = Options::default();
-    opt.dir_path = PathBuf::from("/tmp/bitkv-rs-iter-list_keys");
+    opt.dir_path = PathBuf::from("/tmp/flash-kv-iter-list_keys");
     opt.data_file_size = 64 * 1024 * 1024; // 64MB
     let engine = Engine::open(opt.clone()).expect("fail to open engine");
 
@@ -156,7 +156,7 @@ mod tests {
   #[test]
   fn test_iterator_seek() {
     let mut opt = Options::default();
-    opt.dir_path = PathBuf::from("/tmp/bitkv-rs-iter-seek");
+    opt.dir_path = PathBuf::from("/tmp/flash-kv-iter-seek");
     opt.data_file_size = 64 * 1024 * 1024; // 64MB
     let engine = Engine::open(opt.clone()).expect("fail to open engine");
 
@@ -204,7 +204,7 @@ mod tests {
   #[test]
   fn test_iterator_next() {
     let mut opt = Options::default();
-    opt.dir_path = PathBuf::from("/tmp/bitkv-rs-iter-next");
+    opt.dir_path = PathBuf::from("/tmp/flash-kv-iter-next");
     opt.data_file_size = 64 * 1024 * 1024; // 64MB
     let engine = Engine::open(opt.clone()).expect("fail to open engine");
 
@@ -252,7 +252,7 @@ mod tests {
   #[test]
   fn test_iterator_prefix() {
     let mut opt = Options::default();
-    opt.dir_path = PathBuf::from("/tmp/bitkv-rs-iter-prefix");
+    opt.dir_path = PathBuf::from("/tmp/flash-kv-iter-prefix");
     opt.data_file_size = 64 * 1024 * 1024; // 64MB
     let engine = Engine::open(opt.clone()).expect("fail to open engine");
 

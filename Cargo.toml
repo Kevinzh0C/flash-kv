@@ -1,11 +1,11 @@
 [package]
-name = "bitkv-rs"
+name = "flash-kv"
 version = "0.2.1"
 authors = ["kevin zhang <kaiqiz07@gmail.com>"]
 description = "A simple k/v store API inspired by bitcask"
 edition = "2021"
-repository = "https://github.com/KevinZh0A/bitkv-rs"
-homepage = "https://github.com/KevinZh0A/bitkv-rs"
+repository = "https://github.com/KevinZh0A/FlashKV-rs"
+homepage = "https://github.com/KevinZh0A/FlashKV-rs"
 license = "MIT"
 
 
