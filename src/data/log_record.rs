@@ -123,7 +123,7 @@ impl LogRecordType {
 
 // get max log record header length
 pub fn max_log_record_header_size() -> usize {
-  std::mem::size_of::<u8>() + length_delimiter_len(std::u32::MAX as usize) * 2
+  std::mem::size_of::<u8>() + length_delimiter_len(u32::MAX as usize) * 2
 }
 
 // decode LogRecordPos
@@ -168,7 +168,7 @@ mod tests {
 
     // set a log record which value is empty
     let rec2 = LogRecord {
-      key: "bitkv-rs".as_bytes().to_vec(),
+      key: "flash-kv".as_bytes().to_vec(),
       value: vec![],
       rec_type: LogRecordType::Normal,
     };

@@ -12,7 +12,7 @@ use crate::{
 #[test]
 fn test_engine_put() {
   let mut opt = Options::default();
-  opt.dir_path = PathBuf::from("/tmp/bitkv-rs-put");
+  opt.dir_path = PathBuf::from("/tmp/flash-kv-put");
   opt.data_file_size = 64 * 1024 * 1024; // 64MB
   let engine = Engine::open(opt.clone()).expect("fail to open engine");
 
@@ -65,7 +65,7 @@ fn test_engine_put() {
 #[test]
 fn test_engine_get() {
   let mut opt = Options::default();
-  opt.dir_path = PathBuf::from("/tmp/bitkv-rs-get");
+  opt.dir_path = PathBuf::from("/tmp/flash-kv-get");
   opt.data_file_size = 64 * 1024 * 1024; // 64MB
   let engine = Engine::open(opt.clone()).expect("fail to open engine");
 
@@ -125,7 +125,7 @@ fn test_engine_get() {
 #[test]
 fn test_engine_delete() {
   let mut opt = Options::default();
-  opt.dir_path = PathBuf::from("/tmp/bitkv-rs-delete");
+  opt.dir_path = PathBuf::from("/tmp/flash-kv-delete");
   opt.data_file_size = 64 * 1024 * 1024; // 64MB
   let engine = Engine::open(opt.clone()).expect("fail to open engine");
 
@@ -170,7 +170,7 @@ fn test_engine_delete() {
 #[test]
 fn test_engine_sync() {
   let mut opt = Options::default();
-  opt.dir_path = PathBuf::from("/tmp/bitkv-rs-sync");
+  opt.dir_path = PathBuf::from("/tmp/flash-kv-sync");
   opt.data_file_size = 64 * 1024 * 1024; // 64MB
   let engine = Engine::open(opt.clone()).expect("fail to open engine");
 
@@ -187,7 +187,7 @@ fn test_engine_sync() {
 #[test]
 fn test_engine_close() {
   let mut opt = Options::default();
-  opt.dir_path = PathBuf::from("/tmp/bitkv-rs-close");
+  opt.dir_path = PathBuf::from("/tmp/flash-kv-close");
   opt.data_file_size = 64 * 1024 * 1024; // 64MB
   let engine = Engine::open(opt.clone()).expect("fail to open engine");
 
@@ -204,7 +204,7 @@ fn test_engine_close() {
 #[test]
 fn test_engine_filelock() {
   // let mut opt = Options::default();
-  // opt.dir_path = PathBuf::from("/tmp/bitkv-rs-close");
+  // opt.dir_path = PathBuf::from("/tmp/flash-kv-close");
   // opt.data_file_size = 64 * 1024 * 1024; // 64MB
   // let engine = Engine::open(opt.clone()).expect("fail to open engine");
 
@@ -218,7 +218,7 @@ fn test_engine_filelock() {
   // std::fs::remove_dir_all(opt.clone().dir_path).expect("failed to remove dir");
 
   let mut opt = Options::default();
-  opt.dir_path = PathBuf::from("/tmp/bitkv-rs-flock");
+  opt.dir_path = PathBuf::from("/tmp/flash-kv-flock");
   let engine = Engine::open(opt.clone()).expect("fail to open engine");
 
   let res1 = Engine::open(opt.clone());
@@ -237,7 +237,7 @@ fn test_engine_filelock() {
 #[test]
 fn test_engine_stat() {
   let mut opts = option::Options::default();
-  opts.dir_path = PathBuf::from("/tmp/bitkv-rs-stat");
+  opts.dir_path = PathBuf::from("/tmp/flash-kv-stat");
   opts.data_file_size = 64 * 1024 * 1024; // 64MB
   let engine = Engine::open(opts.clone()).expect("fail to open engine");
 
@@ -262,7 +262,7 @@ fn test_engine_stat() {
 #[test]
 fn test_engine_backup() {
   let mut opts = option::Options::default();
-  opts.dir_path = PathBuf::from("/tmp/bitkv-rs-backup");
+  opts.dir_path = PathBuf::from("/tmp/flash-kv-backup");
   opts.data_file_size = 64 * 1024 * 1024; // 64MB
   let engine = Engine::open(opts.clone()).expect("fail to open engine");
 
@@ -271,7 +271,7 @@ fn test_engine_backup() {
     assert!(res.is_ok());
   }
 
-  let backup_dir = PathBuf::from("/tmp/bitkv-rs-backup-test");
+  let backup_dir = PathBuf::from("/tmp/flash-kv-backup-test");
   let backup_res = engine.backup(backup_dir.clone());
   assert!(backup_res.is_ok());
 
