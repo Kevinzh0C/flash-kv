@@ -74,17 +74,25 @@ jobs:
           toolchain: nightly
           override: true
 
-      - uses: Swatinem/rust-cache@v2
+
+      - uses: Swatinem/rust-cache@v1
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: test all features
         # Run sequentially to avoid race condition around file system size
-        run: cargo test --all-features -- --test-threads 1
+        # Add timeout to prevent test hanging
+        run: timeout 300 cargo test --all-features -- --test-threads 1
 
   coverage:
     name: cargo tarpaulin
     runs-on: ubuntu-latest
     needs:
-      - docs
       - unit-tests
       - clippy
       - rustfmt

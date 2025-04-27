@@ -87,7 +87,7 @@ impl WriteBatch<'_> {
   /// commit the batch write to data file, and update index
   pub fn commit(&self) -> Result<()> {
     let mut pending_writes = self.pending_writes.lock();
-    if pending_writes.len() == 0 {
+    if pending_writes.is_empty() {
       return Ok(());
     }
     if pending_writes.len() > self.options.max_batch_num {
@@ -184,7 +184,7 @@ mod tests {
   #[test]
   fn test_write_batch_1() {
     let mut opt = Options::default();
-    opt.dir_path = PathBuf::from("/tmp/bitkv-rs-batch-1");
+    opt.dir_path = PathBuf::from("/tmp/flash-kv-batch-1");
     opt.data_file_size = 64 * 1024 * 1024; // 64MB
     let engine = Engine::open(opt.clone()).expect("fail to open engine");
 
@@ -218,7 +218,7 @@ mod tests {
   #[test]
   fn test_write_batch_2() {
     let mut opt = Options::default();
-    opt.dir_path = PathBuf::from("/tmp/bitkv-rs-batch-2");
+    opt.dir_path = PathBuf::from("/tmp/flash-kv-batch-2");
     opt.data_file_size = 64 * 1024 * 1024; // 64MB
     let engine = Engine::open(opt.clone()).expect("fail to open engine");
 
@@ -255,7 +255,7 @@ mod tests {
   #[test]
   fn test_write_batch_3() {
     let mut opt = Options::default();
-    opt.dir_path = PathBuf::from("/tmp/bitkv-rs-batch-2");
+    opt.dir_path = PathBuf::from("/tmp/flash-kv-batch-2");
     opt.data_file_size = 64 * 1024 * 1024; // 64MB
     let engine = Engine::open(opt.clone()).expect("fail to open engine");
 

@@ -1,9 +1,9 @@
-use bitkv_rs::{db, option::Options};
 use bytes::Bytes;
+use flash_kv::{db, option::Options};
 
 fn main() {
   let opts = Options::default();
-  let engine = db::Engine::open(opts).expect("fail to open bitkv engine");
+  let engine = db::Engine::open(opts).expect("fail to open flash-kv engine");
 
   let key = Bytes::from(b"hello".to_vec());
   let value = Bytes::from(b"world".to_vec());
