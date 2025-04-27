@@ -17,7 +17,7 @@ use crate::{
 const TXN_FIN_KEY: &[u8] = "txn-fin".as_bytes();
 pub(crate) const NON_TXN_SEQ_NO: usize = 0;
 
-/// A batch of write operations. Ensuring Atomicity and Consistency.
+/// A batch of write operations ensuring atomicity and consistency.
 pub struct WriteBatch<'a> {
   pending_writes: Arc<Mutex<HashMap<Vec<u8>, LogRecord>>>, // temporarily store the write data
   engine: &'a Engine,
@@ -25,7 +25,8 @@ pub struct WriteBatch<'a> {
 }
 
 impl Engine {
-  /// Create a new write batch.
+  /// Creates a new write batch for grouped operations.
+  /// * `options` - Configuration options for the write batch.
   pub fn new_write_batch(&self, options: WriteBatchOptions) -> Result<WriteBatch> {
     if self.options.index_type == IndexType::BPlusTree && !self.seq_file_exists && !self.is_initial
     {
@@ -41,7 +42,7 @@ impl Engine {
 }
 
 impl WriteBatch<'_> {
-  /// batch put data
+  /// Adds a key-value pair to the write batch.
   pub fn put(&self, key: Bytes, value: Bytes) -> Result<()> {
     if key.is_empty() {
       return Err(Errors::KeyIsEmpty);
@@ -59,6 +60,7 @@ impl WriteBatch<'_> {
     Ok(())
   }
 
+  /// Marks a key for deletion in the write batch.
   pub fn delete(&self, key: Bytes) -> Result<()> {
     if key.is_empty() {
       return Err(Errors::KeyIsEmpty);
@@ -84,7 +86,6 @@ impl WriteBatch<'_> {
     Ok(())
   }
 
-  /// commit the batch write to data file, and update index
   pub fn commit(&self) -> Result<()> {
     let mut pending_writes = self.pending_writes.lock();
     if pending_writes.is_empty() {
@@ -154,7 +155,6 @@ impl WriteBatch<'_> {
   }
 }
 
-// encode log record key with sequence number
 pub(crate) fn log_record_key_with_seq(key: Vec<u8>, seq_no: usize) -> Vec<u8> {
   let mut enc_key = BytesMut::new();
   encode_length_delimiter(seq_no, &mut enc_key).unwrap();
@@ -162,7 +162,6 @@ pub(crate) fn log_record_key_with_seq(key: Vec<u8>, seq_no: usize) -> Vec<u8> {
   enc_key.to_vec()
 }
 
-// decode log record key and return key and sequence number
 pub(crate) fn parse_log_record_key(key: Vec<u8>) -> (Vec<u8>, usize) {
   let mut buf = BytesMut::new();
   buf.put_slice(&key);
