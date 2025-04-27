@@ -28,12 +28,19 @@ use std::{
 const INITIAL_FILE_ID: u32 = 0;
 const SEQ_NO_KEY: &str = "seq.no";
 pub(crate) const FILE_LOCK_NAME: &str = "flock";
+
+/// Represents the sequence number existence state.
 pub enum SeqNoExist {
+  /// Sequence number exists with a specific value.
   Yes(usize),
+  /// Sequence number does not exist.
   None,
 }
 
-// Storage Engine
+/// The main storage engine for Flash-KV.
+///
+/// `Engine` is the central component that coordinates all operations in the key-value store.
+/// It manages data files, indexes, and provides methods for storing, retrieving, and deleting data.
 pub struct Engine {
   pub(crate) options: Arc<Options>,
   pub(crate) active_data_file: Arc<RwLock<DataFile>>, // current active data file
@@ -50,24 +57,43 @@ pub struct Engine {
   pub(crate) reclaim_size: Arc<AtomicUsize>, // the add up number of bytes to be merged
 }
 
-// engine statistics info
+/// Statistics about the engine state.
+///
+/// Provides information about the number of keys, data files, and disk usage.
 #[derive(Debug, Clone)]
 pub struct Stat {
-  // number of keys
+  /// Number of keys in the database
   pub key_num: usize,
 
-  // number of data files
+  /// Number of data files
   pub data_file_num: usize,
 
-  // number of data files to be merged
+  /// Number of bytes that can be reclaimed through merging
   pub reclaim_size: usize,
 
-  // total directory size on disk
+  /// Total size of the database directory on disk in bytes
   pub disk_size: u64,
 }
-
 impl Engine {
-  /// open flash-kv storage engine instance
+  /// Opens a Flash-KV storage engine instance.
+  ///
+  /// This function creates a new engine instance or opens an existing database
+  /// at the specified directory path. It initializes the storage engine, loads existing
+  /// data files, and rebuilds the in-memory index.
+  ///
+  /// # Arguments
+  ///
+  /// * `opts` - Configuration options for the engine.
+  ///
+  /// # Returns
+  ///
+  /// A `Result` containing the initialized `Engine` instance or an error.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if the database directory cannot be created or accessed,
+  /// if the database is already being used by another process, or if data files
+  /// cannot be loaded.
   pub fn open(opts: Options) -> Result<Self> {
     // check user options
     if let Some(e) = check_options(&opts) {
@@ -185,7 +211,19 @@ impl Engine {
     Ok(engine)
   }
 
-  /// close engine, release resources
+  /// Closes the engine and releases resources.
+  ///
+  /// This method ensures that all pending data is written to disk and
+  /// releases the file lock, allowing other processes to access the database.
+  ///
+  /// # Returns
+  ///
+  /// A `Result` indicating success or an error.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if the engine fails to write sequence number information
+  /// or sync data to disk.
   pub fn close(&self) -> Result<()> {
     // if dir_path doesn't exist, return
     if !self.options.dir_path.is_dir() {
@@ -211,12 +249,35 @@ impl Engine {
     Ok(())
   }
 
-  /// sync current active data file to disk
+  /// Synchronizes the current active data file to disk.
+  ///
+  /// This method ensures that all data in the active file is written to
+  /// persistent storage, providing durability guarantees.
+  ///
+  /// # Returns
+  ///
+  /// A `Result` indicating success or an error.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if the sync operation fails.
   pub fn sync(&self) -> Result<()> {
     let read_guard = self.active_data_file.read();
     read_guard.sync()
   }
 
+  /// Retrieves statistics about the engine state.
+  ///
+  /// This method collects information about the number of keys, data files,
+  /// reclaimable space, and total disk usage.
+  ///
+  /// # Returns
+  ///
+  /// A `Result` containing the `Stat` structure with engine statistics.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if statistics cannot be collected.
   pub fn get_engine_stat(&self) -> Result<Stat> {
     let keys = self.list_keys()?;
     let old_files = self.old_data_files.read();
@@ -229,7 +290,22 @@ impl Engine {
     })
   }
 
-  /// backup data directory
+  /// Creates a backup of the database directory.
+  ///
+  /// This method copies all database files to the specified directory,
+  /// excluding the file lock.
+  ///
+  /// # Arguments
+  ///
+  /// * `dir_path` - The path where the backup will be created.
+  ///
+  /// # Returns
+  ///
+  /// A `Result` indicating success or an error.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if the backup operation fails.
   pub fn backup<P>(&self, dir_path: P) -> Result<()>
   where
     P: AsRef<Path>,
@@ -246,7 +322,23 @@ impl Engine {
     Ok(())
   }
 
-  /// store a key/value pair, ensuring key isn't null.
+  /// Stores a key-value pair in the database.
+  ///
+  /// This method writes a new record to the active data file and updates
+  /// the in-memory index. If the key already exists, its value is updated.
+  ///
+  /// # Arguments
+  ///
+  /// * `key` - The key to store.
+  /// * `value` - The value to associate with the key.
+  ///
+  /// # Returns
+  ///
+  /// A `Result` indicating success or an error.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if the key is empty or if the write operation fails.
   pub fn put(&self, key: Bytes, value: Bytes) -> Result<()> {
     // if the key is valid
     if key.is_empty() {
@@ -272,7 +364,22 @@ impl Engine {
     Ok(())
   }
 
-  // delete the data associated with the specified key.
+  /// Deletes a key-value pair from the database.
+  ///
+  /// This method marks the key as deleted in the data file and removes it
+  /// from the in-memory index. If the key doesn't exist, the operation is a no-op.
+  ///
+  /// # Arguments
+  ///
+  /// * `key` - The key to delete.
+  ///
+  /// # Returns
+  ///
+  /// A `Result` indicating success or an error.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if the key is empty or if the delete operation fails.
   pub fn delete(&self, key: Bytes) -> Result<()> {
     // if the key is valid
     if key.is_empty() {
@@ -307,7 +414,22 @@ impl Engine {
     Ok(())
   }
 
-  /// Retrieves the data associated with the specified key.
+  /// Retrieves the value associated with a key.
+  ///
+  /// This method looks up the key in the in-memory index and reads the
+  /// corresponding value from the data file.
+  ///
+  /// # Arguments
+  ///
+  /// * `key` - The key to look up.
+  ///
+  /// # Returns
+  ///
+  /// A `Result` containing the value associated with the key.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if the key is empty, not found, or if the read operation fails.
   pub fn get(&self, key: Bytes) -> Result<Bytes> {
     // if the key is empty then return
     if key.is_empty() {
@@ -592,7 +714,16 @@ impl Drop for Engine {
   }
 }
 
-// load data files from database directory
+/// Loads data files from the database directory.
+///
+///
+/// # Arguments
+///
+/// * `dir_path` - Path to the database directory
+///
+/// # Errors
+///
+/// Returns an error if the directory cannot be read or if data files are corrupted
 fn load_data_files<P>(dir_path: P, use_mmap: bool) -> Result<Vec<DataFile>>
 where
   P: AsRef<Path>,
@@ -645,6 +776,14 @@ where
   Ok(data_files)
 }
 
+///
+///
+/// # Arguments
+///
+/// * `opts` - The options to validate
+///
+/// # Returns
+///
 fn check_options(opts: &Options) -> Option<Errors> {
   let dir_path = opts.dir_path.to_str();
   if dir_path.is_none() || dir_path.unwrap().is_empty() {
