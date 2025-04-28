@@ -30,9 +30,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
 
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: nightly          
+          toolchain: nightly
           components: rustfmt, clippy, llvm-tools-preview
 
       - uses: mozilla-actions/sccache-action@v0.0.4
@@ -63,10 +63,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: 1.83.0
-          override: true
           components: rustfmt, clippy, llvm-tools-preview
 
       - uses: mozilla-actions/sccache-action@v0.0.4
@@ -95,10 +94,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: nightly
-          override: true
 
       - uses: mozilla-actions/sccache-action@v0.0.4
       - uses: Swatinem/rust-cache@v2
