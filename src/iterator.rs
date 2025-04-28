@@ -4,14 +4,15 @@ use std::sync::Arc;
 
 use crate::{db::Engine, errors::Result, index::IndexIterator, option::IteratorOptions};
 
-/// Iterator interface
+/// Iterator for traversing key-value pairs in the database.
 pub struct Iterator<'a> {
-  index_iter: Arc<RwLock<Box<dyn IndexIterator>>>, // index iterator
+  index_iter: Arc<RwLock<Box<dyn IndexIterator>>>,
   engine: &'a Engine,
 }
 
 impl Engine {
-  /// Create a new iterator
+  /// Creates a new iterator with the specified options.
+  /// An iterator instance for traversing the database.
   pub fn iter(&self, options: IteratorOptions) -> Iterator {
     Iterator {
       index_iter: Arc::new(RwLock::new(self.index.iterator(options))),
@@ -19,12 +20,14 @@ impl Engine {
     }
   }
 
-  /// list all keys in db
+  /// Lists all keys in the database.
+  /// A `Result` containing a vector of all keys in the database.
   pub fn list_keys(&self) -> Result<Vec<Bytes>> {
     self.index.list_keys()
   }
 
-  /// operate on all key-value pairs in db, finish when `f` returns false
+  /// Applies a function to all key-value pairs in the database.
+  /// Iterates through all key-value pairs and applies the provided function.
   pub fn fold<F>(&self, f: F) -> Result<()>
   where
     Self: Sized,
@@ -41,19 +44,16 @@ impl Engine {
 }
 
 impl Iterator<'_> {
-  // `Rewind` go back to the beginning of the iterator
   pub fn rewind(&self) {
     let mut index_iter = self.index_iter.write();
     index_iter.rewind();
   }
 
-  // `Seek` search for the first entry with a key greater than or equal to the given key
   pub fn seek(&self, key: Vec<u8>) {
     let mut index_iter = self.index_iter.write();
     index_iter.seek(key);
   }
 
-  // `Next` move to the next entry, when the iterator is exhausted, return None
   pub fn next(&self) -> Option<(Bytes, Bytes)> {
     let mut index_iter = self.index_iter.write();
     if let Some(item) = index_iter.next() {

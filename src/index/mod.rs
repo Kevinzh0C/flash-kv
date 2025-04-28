@@ -12,24 +12,23 @@ use crate::{
   option::{IndexType, IteratorOptions},
 };
 
-// Abstract interface specifies methods for interchangeable indexing data structures
 pub trait Indexer: Sync + Send {
-  /// Store key's position into indexer
   fn put(&self, key: Vec<u8>, pos: LogRecordPos) -> Option<LogRecordPos>;
 
-  /// Retrieve key's position
+  /// Retrieves a key's position from the index.
   fn get(&self, key: Vec<u8>) -> Option<LogRecordPos>;
 
-  /// Delete the position in indexer by key
+  /// Deletes a key's position from the index.
   fn delete(&self, key: Vec<u8>) -> Option<LogRecordPos>;
 
-  /// List all keys in the indexer
   fn list_keys(&self) -> Result<Vec<Bytes>>;
 
-  /// Create an iterator for the indexer
+  /// Creates an iterator for the index with the specified options.
+  /// * `options` - Configuration options for the iterator
   fn iterator(&self, options: IteratorOptions) -> Box<dyn IndexIterator>;
 }
 
+/// Creates a new indexer based on the specified index type and directory path.
 pub fn new_indexer(index_type: &IndexType, dir_path: &PathBuf) -> Box<dyn Indexer> {
   match *index_type {
     IndexType::BTree => Box::new(btree::BTree::new()),
@@ -38,14 +37,11 @@ pub fn new_indexer(index_type: &IndexType, dir_path: &PathBuf) -> Box<dyn Indexe
   }
 }
 
-// Abstract interface specifies methods for interchangeable index iterators
+/// Provides methods for iterating over key-value pairs in the index.
 pub trait IndexIterator: Sync + Send {
-  // `Rewind` go back to the beginning of the iterator
   fn rewind(&mut self);
 
-  // `Seek` search for the first entry with a key greater than or equal to the given key
   fn seek(&mut self, key: Vec<u8>);
 
-  // `Next` move to the next entry, when the iterator is exhausted, return None
   fn next(&mut self) -> Option<(&Vec<u8>, &LogRecordPos)>;
 }

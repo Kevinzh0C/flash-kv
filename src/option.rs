@@ -7,37 +7,27 @@ lazy_static! {
 
 #[derive(Debug, Clone)]
 pub struct Options {
-  // database directory
   pub dir_path: PathBuf,
 
-  //data file size
   pub data_file_size: u64,
 
-  // sync writes or not
   pub sync_writes: bool,
 
-  // the number of bytes to write before sync
   pub bytes_per_sync: usize,
 
-  // index type option
   pub index_type: IndexType,
 
-  // use mmap or not
   pub mmap_at_startup: bool,
 
-  // merge threshold
   pub file_merge_threshold: f32,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum IndexType {
-  /// Btree index
   BTree,
 
-  /// SkipList index
   SkipList,
 
-  /// B+Tree index
   BPlusTree,
 }
 
@@ -70,10 +60,8 @@ impl Default for IteratorOptions {
 }
 
 pub struct WriteBatchOptions {
-  // max batch number in one batch write
   pub max_batch_num: usize,
-
-  // when commit if sync or not
+  
   pub sync_writes: bool,
 }
 
@@ -88,9 +76,7 @@ impl Default for WriteBatchOptions {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IOManagerType {
-  // Standard IO file
   StandardFileIO,
 
-  // Memory Map IO
   MemoryMap,
 }
