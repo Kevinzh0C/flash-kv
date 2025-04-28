@@ -2,25 +2,21 @@ name: Rust CI
 
 on:
   push:
-    branches: ['*'] 
-    paths-ignore:   
-      # Don't run Clippy tests, when only textfiles were modified 
-      - 'README.md'
-      - 'COPYRIGHT'
-      - 'LICENSE-*'
-      - '**/*.md'
-      - '**/*.txt'
-      - '.gitignore'
+    branches: ["*"]
+    paths-ignore:
+      - "**/*.md"
+      - "**/*.txt"
+      - ".gitignore"
+      - "LICENSE-*"
+      - "COPYRIGHT"
   pull_request:
-    paths-ignore:  
-      # Don't run Clippy tests, when only textfiles were modified  
-      - 'README.md'
-      - 'COPYRIGHT'
-      - 'LICENSE-*'
-      - '**/*.md'
-      - '**/*.txt'
-      - '.gitignore'
-  workflow_dispatch: 
+    paths-ignore:
+      - "**/*.md"
+      - "**/*.txt"
+      - ".gitignore"
+      - "LICENSE-*"
+      - "COPYRIGHT"
+  workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
@@ -28,106 +24,85 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
-  rustfmt:
-    name: rustfmt
+  lint-test-coverage:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Rust stable
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-          components: rustfmt
-      - uses: Swatinem/rust-cache@v2
-      - name: Check formatting
-        run: cargo fmt --all -- --check
-        continue-on-error: true
-
-  clippy:
-    name: clippy
-    runs-on: ubuntu-latest
-    steps:
       - uses: actions/checkout@v4
-      - name: Install Rust stable
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-          components: clippy
-      - uses: Swatinem/rust-cache@v2
-      - name: Apply clippy lints
-        run: cargo clippy --all-features -- -D warnings
 
-  unit-tests:
-    name: unit tests
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install latest nightly
-        uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: nightly
-          override: true
+          components: rustfmt, clippy, llvm-tools-preview
 
-      # Use Swatinem/rust-cache@v2 for caching
+      - uses: mozilla-actions/sccache-action@v0.0.4
       - uses: Swatinem/rust-cache@v2
 
-      # Install cargo-nextest
       - name: Install cargo-nextest
         uses: taiki-e/install-action@v2
         with:
           tool: cargo-nextest
 
-      - name: Test all features
-        # Run sequentially to avoid race condition around file system size
-        # Add timeout via GitHub Actions step property
-        timeout-minutes: 5 # 300 seconds
-        # Use cargo nextest run instead of cargo test
-        run: cargo nextest run --all-features 
+      - name: Format & clippy checks
+        run: |
+          cargo fmt --all -- --check
+          cargo clippy --workspace --all-features -- -D warnings
+        continue-on-error: true
 
+      - name: Build & run tests
+        run: |
+          cargo test --workspace --all-features --no-run
+          cargo nextest run --all-features
+
+  
   coverage:
-    name: cargo tarpaulin
+    needs: lint-test-coverage
+    if: ${{ success() }}
     runs-on: ubuntu-latest
-    needs:
-      - unit-tests
-      - clippy
-      - rustfmt
+
     steps:
       - uses: actions/checkout@v4
-      - name: Install latest nightly
-        uses: actions-rs/toolchain@v1
+
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: nightly
-          override: true
-      - name: Install cargo-tarpaulin
-        run: cargo install cargo-tarpaulin --version 0.27.3
+          toolchain: 1.83.0
+          components: rustfmt, clippy, llvm-tools-preview
+
+      - uses: mozilla-actions/sccache-action@v0.0.4
       - uses: Swatinem/rust-cache@v2
-      - name: Run tarpaulin
-        run: cargo tarpaulin --all-features --run-types tests --run-types doctests --workspace --out xml -- --test-threads 1
-      - name: Upload to codecov.io
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov
+
+      - name: Generate coverage (llvm-cov)
+        run: |
+          mkdir -p coverage
+          cargo llvm-cov --workspace --all-features --lcov --output-path coverage/lcov.info
+
+      - name: Upload to Codecov
         uses: codecov/codecov-action@v4
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
           fail_ci_if_error: true
 
   docs:
-    name: Generate Documentation
+    needs: lint-test-coverage
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
+
+      - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: nightly
-          override: true
+
+      - uses: mozilla-actions/sccache-action@v0.0.4
       - uses: Swatinem/rust-cache@v2
-      - name: Generate documentation
-        run: cargo doc --lib --no-deps --all-features --document-private-items
+
+      - name: Build docs
         env:
-          RUSTFLAGS: ${{ env.RUSTFLAGS }} --cfg docsrs
-          RUSTDOCFLAGS: --cfg docsrs -Dwarnings
+          RUSTFLAGS: "${{ env.RUSTFLAGS }} --cfg docsrs"
+          RUSTDOCFLAGS: "--cfg docsrs"
+        run: cargo doc --workspace --all-features --no-deps --document-private-items
