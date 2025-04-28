@@ -7,17 +7,12 @@ use prost::{
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum LogRecordType {
-  // normal putting data
   Normal = 1,
 
-  // deleted data, tombstone value
   Deleted = 2,
 
-  // transaction finished
   TxnFinished = 3,
 }
-// LogRecord write to data file record
-// for it is called log, data writes by appending to datafile, WAL format
 #[derive(Debug)]
 pub struct LogRecord {
   pub(crate) key: Vec<u8>,
@@ -25,22 +20,19 @@ pub struct LogRecord {
   pub(crate) rec_type: LogRecordType,
 }
 
-// data position index info, describes a position data stores
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct LogRecordPos {
-  pub(crate) file_id: u32, // data file id, indicates which file stores the data
-  pub(crate) offset: u64,  // data file offset, indicates where the data stores in the file
-  pub(crate) size: u32,    // data space in disk, for data file compaction
+  pub(crate) file_id: u32,
+  pub(crate) offset: u64,
+  pub(crate) size: u32,
 }
 
-// read log_record info from data file, contains its size
 #[derive(Debug)]
 pub struct ReadLogRecord {
   pub(crate) record: LogRecord,
   pub(crate) size: usize,
 }
 
-// temp record for transaction
 pub struct TransactionRecord {
   pub(crate) record: LogRecord,
   pub(crate) pos: LogRecordPos,
@@ -121,12 +113,10 @@ impl LogRecordType {
   }
 }
 
-// get max log record header length
 pub fn max_log_record_header_size() -> usize {
   std::mem::size_of::<u8>() + length_delimiter_len(u32::MAX as usize) * 2
 }
 
-// decode LogRecordPos
 pub fn decode_log_record_pos(pos: Vec<u8>) -> LogRecordPos {
   let mut buf = BytesMut::new();
   buf.put_slice(&pos);
