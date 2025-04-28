@@ -14,7 +14,7 @@ use std::{
     Arc,
   },
 };
-use surf::post as surf_post; // 为避免与 actix_web 的 post 宏冲突
+use surf::post as surf_post; // To avoid conflict with actix_web post macro
 use tokio::{
   io::{self, AsyncBufReadExt, BufReader},
   sync::broadcast,
@@ -190,7 +190,7 @@ async fn main() -> std::io::Result<()> {
     eprintln!("failed to close engine: {}", e);
   }
 
-  let _ = shutdown_handle.abort();
+  shutdown_handle.abort();
   println!("engine is closed");
 
   Ok(())
