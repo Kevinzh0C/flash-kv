@@ -68,7 +68,7 @@ impl IOManager for MMapIO {
 
 #[cfg(test)]
 mod tests {
-  use std::{fs, path::PathBuf};
+  use std::fs;
   use tempfile::tempdir;
 
   use crate::fio::file_io::FileIO;
@@ -90,7 +90,7 @@ mod tests {
       .unwrap();
     file.sync_all().unwrap();
 
-    let metadata = fs::metadata(&path).unwrap();
+    let _metadata = fs::metadata(&path).unwrap();
 
     let mmap_res1 = MMapIO::new(&path);
     assert!(mmap_res1.is_ok());
@@ -109,7 +109,7 @@ mod tests {
     fio.write(b"seeyou again").unwrap();
     fio.sync().unwrap();
 
-    let metadata = fs::metadata(&path).unwrap();
+    let _metadata = fs::metadata(&path).unwrap();
 
     let mmap_res2 = MMapIO::new(&path);
     assert!(mmap_res2.is_ok());
