@@ -4,10 +4,10 @@
 
 <div align="center">
 
-[<img alt="github" src="https://img.shields.io/badge/github-KevinZh0C%2Fflash--kv-8da0cb?style=for-the-badge&logo=GitHub&label=github&color=8da0cb" height="22">][Github-url]
-[<img alt="Build" src="https://img.shields.io/github/actions/workflow/status/KevinZh0C/FlashKV-rs/rust.yml?branch=main&style=for-the-badge&logo=Github-Actions&cacheSeconds= d" height="22">][CI-url]
-[<img alt="Codecov" src="https://img.shields.io/codecov/c/gh/KevinZh0C/FlashKV-rs?token=6DNS3IF3MO&style=for-the-badge&logo=codecov" height="22">][codecov-url]
-<img alt="GitHub License" src="https://img.shields.io/github/license/KevinZh0C/FlashKV-rs?style=for-the-badge&logo=license&label=license" height="22">
+[<img alt="github" src="https://img.shields.io/badge/github-Kevinzh0C%2Fflash--kv-8da0cb?style=for-the-badge&logo=GitHub&label=github&color=8da0cb" height="22">][Github-url]
+[<img alt="Build" src="https://img.shields.io/github/actions/workflow/status/Kevinzh0C/FlashKV-rs/rust.yml?branch=main&style=for-the-badge&logo=Github-Actions" height="22">][CI-url]
+[<img alt="Codecov" src="https://img.shields.io/codecov/c/gh/Kevinzh0C/FlashKV-rs?style=for-the-badge&logo=codecov" height="22">][codecov-url]
+[<img alt="GitHub License" src="https://img.shields.io/github/license/Kevinzh0C/FlashKV-rs?style=for-the-badge&logo=license&label=license" height="22">][License-url]
 
 An efficient key-value storage engine, designed for fast reading and writing, which is inspired by [Bitcask][bitcask_url].
 
@@ -80,10 +80,11 @@ This license grants you the freedom to use flash-kv in your own projects, under 
 
 
 [Github-url]: https://github.com/KevinZh0C/FlashKV-rs
-[CI-url]: https://github.com/KevinZh0C/FlashKV-rs/actions/workflows/rust.yml
+[CI-url]: https://github.com/Kevinzh0C/FlashKV-rs/actions/workflows/rust.yml
 [doc-url]: https://docs.rs/flash-kv
 
 [crates-url]: https://crates.io/crates/flash-kv
 [codecov-url]: https://app.codecov.io/gh/KevinZh0C/FlashKV-rs
 [bitcask_url]: https://riak.com/assets/bitcask-intro.pdf
 [`examples`]: https://github.com/KevinZh0C/FlashKV-rs/tree/main/examples
+[License-url]: LICENSE
