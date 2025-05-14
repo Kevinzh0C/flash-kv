@@ -50,15 +50,7 @@ For detailed usage and API documentation, refer to the [flash-kv Documentation](
 
 ## TODO
 
-- [X] Basic error handling
-- [X] Merge files during compaction
-- [X] Configurable compaction triggers and thresholds
-- [X] WriteBactch transaction
-- [X] Use mmap to read data file that on disk.
-- [X] Optimize hintfile storage structure to support the memtable build faster 
-- [X] Http api server
-- [X] Tests
-- [X] Benchmark
+- [X] Core Features (error handling, compaction, transactions, mmap, hintfile optimization, HTTP API, tests, benchmarks)
 - [ ] Documentation 
 - [ ] Increased use of flatbuffers option to support faster reading speed
 - [ ] Extend support for Redis Data Types
