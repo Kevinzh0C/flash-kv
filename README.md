@@ -48,20 +48,15 @@ Please see [`examples`].
 
 For detailed usage and API documentation, refer to the [flash-kv Documentation](https://docs.rs/flash-kv).
 
-## TODO
+## Roadmap
 
-- [X] Basic error handling
-- [X] Merge files during compaction
-- [X] Configurable compaction triggers and thresholds
-- [X] WriteBactch transaction
-- [X] Use mmap to read data file that on disk.
-- [X] Optimize hintfile storage structure to support the memtable build faster 
-- [X] Http api server
-- [X] Tests
-- [X] Benchmark
-- [ ] Documentation 
-- [ ] Increased use of flatbuffers option to support faster reading speed
-- [ ] Extend support for Redis Data Types
+See the [ROADMAP.md](ROADMAP.md) file for detailed information about:
+- Completed features
+- In-progress work
+- Planned features including:
+  - OCC+2PL Transaction Model Implementation
+  - Distributed System Support
+  - Technical challenges to address
 
 ## Contribution
 
