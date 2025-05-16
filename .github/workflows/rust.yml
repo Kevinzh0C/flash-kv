@@ -82,7 +82,7 @@ jobs:
           cargo llvm-cov --workspace --all-features --lcov --output-path coverage/lcov.info
 
       - name: Upload to Codecov
-        uses: codecov/codecov-action@v5.4.2
+        uses: codecov/codecov-action@v5.4.3
         with:
           files: ./coverage/lcov.info
           fail_ci_if_error: true
