@@ -35,7 +35,7 @@ jobs:
           toolchain: nightly
           components: rustfmt, clippy, llvm-tools-preview
 
-      - uses: mozilla-actions/sccache-action@v0.0.4
+      - uses: mozilla-actions/sccache-action@v0.0.9
       - uses: Swatinem/rust-cache@v2
 
       - name: Install cargo-nextest
@@ -68,7 +68,7 @@ jobs:
           toolchain: 1.83.0
           components: rustfmt, clippy, llvm-tools-preview
 
-      - uses: mozilla-actions/sccache-action@v0.0.4
+      - uses: mozilla-actions/sccache-action@v0.0.9
       - uses: Swatinem/rust-cache@v2
 
       - name: Install cargo-llvm-cov
@@ -98,7 +98,7 @@ jobs:
         with:
           toolchain: nightly
 
-      - uses: mozilla-actions/sccache-action@v0.0.4
+      - uses: mozilla-actions/sccache-action@v0.0.9
       - uses: Swatinem/rust-cache@v2
 
       - name: Build docs
